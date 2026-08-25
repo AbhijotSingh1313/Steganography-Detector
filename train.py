@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 from torchvision import datasets, transforms, models
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, WeightedRandomSampler
 from sklearn.metrics import classification_report, confusion_matrix
 from tqdm import tqdm
 
@@ -19,9 +19,9 @@ TRAIN_DIR = os.path.join(DATASET_PATH, "train", "train")
 VAL_DIR = os.path.join(DATASET_PATH, "val", "val")
 TEST_DIR = os.path.join(DATASET_PATH, "test", "test")
 
-IMAGE_SIZE = 224
-BATCH_SIZE = 64
-EPOCHS = 5
+IMAGE_SIZE = 512
+BATCH_SIZE = 8
+EPOCHS = 3
 LEARNING_RATE = 0.0001
 
 DEVICE = torch.device(
@@ -37,7 +37,6 @@ print("Using device:", DEVICE)
 
 train_transforms = transforms.Compose([
     transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
-    transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     transforms.Normalize(
         mean=[0.485, 0.456, 0.406],
@@ -143,13 +142,33 @@ print("Testing images:", len(test_dataset))
 # DATA LOADERS
 # ============================================================
 
+# ============================================================
+# BALANCED TRAINING SAMPLER
+# ============================================================
+
+class_counts = torch.bincount(
+    torch.tensor(train_dataset.targets)
+)
+
+class_weights = 1.0 / class_counts.float()
+
+sample_weights = torch.tensor([
+    class_weights[label]
+    for label in train_dataset.targets
+])
+
+sampler = WeightedRandomSampler(
+    weights=sample_weights,
+    num_samples=len(sample_weights),
+    replacement=True
+)
+
 train_loader = DataLoader(
     train_dataset,
     batch_size=BATCH_SIZE,
-    shuffle=True,
+    sampler=sampler,
     num_workers=0
 )
-
 val_loader = DataLoader(
     val_dataset,
     batch_size=BATCH_SIZE,
@@ -382,21 +401,16 @@ def evaluate(model, loader):
 # ============================================================
 # TRAIN
 # ============================================================
+print("\nStarting new training from Epoch 1...\n")
 
-print("\nContinuing training from Epoch 1...\n")
-
-# Epoch 1 already achieved 74.14% validation accuracy
-best_val_accuracy = 74.14
+best_val_accuracy = 0.0
 
 os.makedirs(
     "models",
     exist_ok=True
 )
 
-# Epoch 1 is already completed.
-# Continue with Epoch 2.
-START_EPOCH = 1
-
+START_EPOCH = 0
 for epoch in range(START_EPOCH, EPOCHS):
 
     print(
@@ -479,7 +493,7 @@ print(
     classification_report(
         labels,
         predictions,
-        target_names=test_dataset.classes
+        target_names=["clean", "stego"]
     )
 )
 
