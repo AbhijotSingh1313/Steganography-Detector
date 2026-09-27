@@ -28,15 +28,7 @@ from app.steganalysis.network import get_network_detector
 async def lifespan(app: FastAPI):
     """Execute startup and shutdown routines."""
     init_db()
-    # Pre-warm AI model and detectors
-    try:
-        get_hybrid_detector()
-        get_text_detector()
-        get_network_detector()
-        from app.steganalysis.text.bert_steganalysis import _get_bert_components
-        _get_bert_components()
-    except Exception as e:
-        print(f"[Warning] Could not pre-warm all detectors: {e}")
+    # Lazy loading models on first request avoids exceeding low-memory container limits on startup
     yield
 
 
