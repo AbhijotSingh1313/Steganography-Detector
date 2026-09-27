@@ -28,11 +28,20 @@ class HybridDetector:
         self.fusion_model = self._load_fusion_model()
 
     def _load_fusion_model(self) -> Optional[Any]:
-        """Load trained scikit-learn fusion classifier if available."""
+        """Load trained fusion parameters with pure-NumPy inference to guarantee cross-version compatibility."""
         if self.fusion_model_path and os.path.exists(self.fusion_model_path):
             try:
                 import joblib
                 model = joblib.load(self.fusion_model_path)
+                scaler = getattr(model, 'named_steps', {}).get('scaler')
+                clf = getattr(model, 'named_steps', {}).get('clf') or getattr(model, 'named_steps', {}).get('classifier')
+                if scaler is not None and clf is not None:
+                    return {
+                        'mean': np.array(scaler.mean_, dtype=np.float64),
+                        'scale': np.array(scaler.scale_, dtype=np.float64),
+                        'coef': np.array(clf.coef_[0], dtype=np.float64),
+                        'intercept': float(clf.intercept_[0]),
+                    }
                 return model
             except Exception:
                 return None
@@ -70,14 +79,26 @@ class HybridDetector:
         dev_half = float(trad_result["block_statistics"]["deviation_from_half"])
         embedded_ratio = float(trad_result["block_statistics"]["embedded_block_ratio"])
 
+        hybrid_prob = None
         if self.fusion_model is not None:
-            # Use trained fusion classifier
-            feat_vec, _ = extract_lsb_feature_vector(image_input, block_size=block_size)
-            # Input vector: [ai_prob, *feat_vec]
-            fusion_input = np.concatenate([[ai_prob], feat_vec]).reshape(1, -1)
-            hybrid_prob = float(self.fusion_model.predict_proba(fusion_input)[0, 1])
-            fusion_method = "trained_classifier"
-        else:
+            try:
+                feat_vec, _ = extract_lsb_feature_vector(image_input, block_size=block_size)
+                fusion_input = np.concatenate([[ai_prob], feat_vec], dtype=np.float64)
+                if isinstance(self.fusion_model, dict):
+                    mean = self.fusion_model['mean']
+                    scale = self.fusion_model['scale']
+                    coef = self.fusion_model['coef']
+                    intercept = self.fusion_model['intercept']
+                    x_s = (fusion_input - mean) / scale
+                    z = float(np.dot(x_s, coef) + intercept)
+                    hybrid_prob = float(1.0 / (1.0 + np.exp(-z)))
+                elif hasattr(self.fusion_model, 'predict_proba'):
+                    hybrid_prob = float(self.fusion_model.predict_proba(fusion_input.reshape(1, -1))[0, 1])
+                fusion_method = "trained_classifier"
+            except Exception:
+                hybrid_prob = None
+
+        if hybrid_prob is None:
             # Principled Calibrated Evidence Fusion:
             # Base combination:
             base_hybrid = 0.55 * ai_prob + 0.45 * trad_score
