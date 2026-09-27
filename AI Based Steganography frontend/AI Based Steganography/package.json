@@ -1,0 +1,78 @@
+{
+  "name": "ai-based-steganography",
+  "version": "1.0.0",
+  "description": "StegoDetect AI - Multimedia Steganography Detection Desktop Application",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"cross-env NODE_ENV=development vite\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "electron:preview": "vite build && cross-env NODE_ENV=production electron .",
+    "electron:start": "cross-env NODE_ENV=production electron .",
+    "build:exe": "vite build && electron-builder --win --config.directories.output=\"%TEMP%\\stegodetect-build\" && node -e \"const fs=require('fs'), path=require('path'), temp=path.join(process.env.TEMP, 'stegodetect-build'), dest='dist-installer'; if(!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive:true}); fs.readdirSync(temp).filter(f=>f.endsWith('.exe')).forEach(f=>{ fs.copyFileSync(path.join(temp,f), path.join(dest,f)); console.log('Copied:', f); }); console.log('All .exe files are ready in dist-installer/');\"",
+    "start": "npm run electron:dev"
+  },
+  "build": {
+    "appId": "com.stegxplore.ai",
+    "productName": "StegXplore",
+    "copyright": "Copyright Â© 2026 StegXplore. All rights reserved.",
+    "asar": true,
+    "icon": "public/icon.ico",
+    "files": [
+      "dist/**/*",
+      "!dist/downloads/**/*",
+      "electron/**/*",
+      "public/icon.png",
+      "public/stegxplore-logo.jpg",
+      "public/stegexplore-logo.jpg"
+    ],
+    "extraResources": [
+      { "from": "public/icon.png", "to": "public/icon.png" },
+      { "from": "public/stegxplore-logo.jpg", "to": "public/stegxplore-logo.jpg" },
+      { "from": "public/stegexplore-logo.jpg", "to": "public/stegexplore-logo.jpg" }
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis",     "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "public/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "StegXplore",
+      "deleteAppDataOnUninstall": false
+    }
+  },
+  "keywords": [
+    "steganography",
+    "forensics",
+    "ai",
+    "detection",
+    "electron",
+    "react"
+  ],
+  "author": "Forensics AI Team",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "canvas-confetti": "^1.9.4",
+    "lucide-react": "^1.33.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.0",
+    "concurrently": "^10.0.5",
+    "cross-env": "^10.1.0",
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3",
+    "vite": "^8.2.2",
+    "wait-on": "^9.1.0"
+  }
+}
+

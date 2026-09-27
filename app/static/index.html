@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Steganalysis Multi-Modal Platform</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="navbar">
+      <div class="brand">
+        <span class="logo-icon">🛡️</span>
+        <div class="brand-text">
+          <h1>Steganalysis Platform</h1>
+          <span class="badge">Multi-Modal v3.0</span>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="/docs" target="_blank" class="nav-btn">API Documentation</a>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <div class="hero-section">
+        <h2>Multi-Modal Steganography Detection Platform</h2>
+        <p>Comprehensive forensic detection covering Image bit-planes, Text formatting modulations, and Network ICMP covert channels.</p>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="image-tab">
+          <span class="tab-icon">🖼️</span> Image Steganalysis
+        </button>
+        <button class="tab-btn" data-tab="text-tab">
+          <span class="tab-icon">📝</span> Text Steganalysis
+        </button>
+        <button class="tab-btn" data-tab="network-tab">
+          <span class="tab-icon">🌐</span> Network Steganalysis (ICMP)
+        </button>
+      </div>
+
+      <!-- TAB 1: IMAGE -->
+      <section id="image-tab" class="tab-pane active">
+        <div class="pane-grid">
+          <div class="card input-card">
+            <h3>Upload Image</h3>
+            <p class="subtitle">Evaluates ResNet18 AI neural patterns alongside Cloacked-Pixel block LSB entropy.</p>
+            <div class="drop-zone" id="image-drop-zone">
+              <span class="upload-icon">📁</span>
+              <p>Drag & drop image here or <strong>browse</strong></p>
+              <span class="file-hint">Supports PNG, JPG, BMP, WebP</span>
+              <input type="file" id="image-file-input" accept="image/*" hidden>
+            </div>
+            <div id="image-preview-container" class="preview-box hidden">
+              <img id="image-preview" src="" alt="Preview">
+              <span id="image-filename" class="filename-text"></span>
+            </div>
+            <button id="image-analyze-btn" class="primary-btn" disabled>Analyze Image</button>
+          </div>
+
+          <div class="card results-card" id="image-results-card">
+            <h3>Analysis Results</h3>
+            <div class="placeholder-state" id="image-placeholder">
+              <p>Upload and analyze an image to view forensic findings.</p>
+            </div>
+            <div class="results-content hidden" id="image-results-content">
+              <div class="verdict-banner" id="image-verdict-banner">
+                <div class="verdict-main">
+                  <span class="verdict-title">PREDICTION</span>
+                  <span class="verdict-value" id="image-prediction">STEGO</span>
+                </div>
+                <div class="verdict-score">
+                  <span>Confidence</span>
+                  <strong id="image-confidence">91.4%</strong>
+                </div>
+              </div>
+
+              <div class="sub-results-grid">
+                <div class="sub-card">
+                  <h4>Existing AI Model (ResNet18)</h4>
+                  <div class="metric-row"><span>Prediction:</span><strong id="ai-pred">STEGO</strong></div>
+                  <div class="metric-row"><span>Probability:</span><span id="ai-prob">84.2%</span></div>
+                  <div class="metric-row"><span>Confidence:</span><span id="ai-conf">84.2%</span></div>
+                </div>
+                <div class="sub-card">
+                  <h4>Traditional LSB (Cloacked-Pixel)</h4>
+                  <div class="metric-row"><span>LSB Mean:</span><span id="trad-mean">0.495</span></div>
+                  <div class="metric-row"><span>Bit Entropy:</span><span id="trad-entropy">0.999</span></div>
+                  <div class="metric-row"><span>Anomaly Score:</span><strong id="trad-score">0.78</strong></div>
+                </div>
+              </div>
+
+              <div class="evidence-box">
+                <h4>Factual Evidence</h4>
+                <ul id="image-evidence-list"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: TEXT -->
+      <section id="text-tab" class="tab-pane">
+        <div class="pane-grid">
+          <div class="card input-card">
+            <h3>Input Text Document</h3>
+            <p class="subtitle">Inspects whitespace modulations, word-shift distributions, and line-shift anomalies.</p>
+            <div class="sample-actions">
+              <span>Quick Samples:</span>
+              <button class="chip-btn" id="sample-normal">Normal Prose</button>
+              <button class="chip-btn" id="sample-ws">Whitespace Stego</button>
+              <button class="chip-btn" id="sample-word">Word-Shift Stego</button>
+            </div>
+            <textarea id="text-input" placeholder="Paste your text here to analyze for hidden steganographic modulations..."></textarea>
+            <div class="file-row">
+              <span>Or upload .txt file:</span>
+              <input type="file" id="text-file-input" accept=".txt">
+            </div>
+            <button id="text-analyze-btn" class="primary-btn">Analyze Text</button>
+          </div>
+
+          <div class="card results-card" id="text-results-card">
+            <h3>Text Steganalysis Findings</h3>
+            <div class="placeholder-state" id="text-placeholder">
+              <p>Enter text or upload a .txt file to inspect formatting characteristics.</p>
+            </div>
+            <div class="results-content hidden" id="text-results-content">
+              <div class="verdict-banner" id="text-verdict-banner">
+                <div class="verdict-main">
+                  <span class="verdict-title">PREDICTION</span>
+                  <span class="verdict-value" id="text-prediction">CLEAN</span>
+                </div>
+                <div class="verdict-score">
+                  <span>Evidence Score</span>
+                  <strong id="text-score">0.00</strong>
+                </div>
+              </div>
+
+              <div class="sub-results-grid three-col">
+                <div class="sub-card">
+                  <h4>Whitespace</h4>
+                  <div class="metric-row"><span>Suspicious:</span><strong id="ws-suspicious">No</strong></div>
+                  <div class="metric-row"><span>Score:</span><span id="ws-score">0.0</span></div>
+                  <div class="metric-row"><span>Trailing Lines:</span><span id="ws-trailing">0</span></div>
+                </div>
+                <div class="sub-card">
+                  <h4>Word-Shift</h4>
+                  <div class="metric-row"><span>Suspicious:</span><strong id="word-suspicious">No</strong></div>
+                  <div class="metric-row"><span>Score:</span><span id="word-score">0.0</span></div>
+                  <div class="metric-row"><span>Multi-Space %:</span><span id="word-ratio">0.0%</span></div>
+                </div>
+                <div class="sub-card">
+                  <h4>Line-Shift</h4>
+                  <div class="metric-row"><span>Suspicious:</span><strong id="line-suspicious">No</strong></div>
+                  <div class="metric-row"><span>Score:</span><span id="line-score">0.0</span></div>
+                  <div class="metric-row"><span>Blank Lines:</span><span id="line-blank">0</span></div>
+                </div>
+              </div>
+
+              <div class="evidence-box">
+                <h4>Forensic Evidence Points</h4>
+                <ul id="text-evidence-list"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: NETWORK -->
+      <section id="network-tab" class="tab-pane">
+        <div class="pane-grid">
+          <div class="card input-card">
+            <h3>Upload PCAP Capture</h3>
+            <p class="subtitle">Defensive, offline inspection of ICMP packet payloads, entropy, and beaconing timing.</p>
+            <div class="drop-zone" id="pcap-drop-zone">
+              <span class="upload-icon">📦</span>
+              <p>Drag & drop packet capture file (.pcap, .pcapng) or <strong>browse</strong></p>
+              <input type="file" id="pcap-file-input" accept=".pcap,.pcapng,.cap" hidden>
+            </div>
+            <div id="pcap-preview-container" class="preview-box hidden">
+              <span class="file-badge">PCAP</span>
+              <span id="pcap-filename" class="filename-text"></span>
+            </div>
+            <button id="pcap-analyze-btn" class="primary-btn" disabled>Analyze Packet Capture</button>
+          </div>
+
+          <div class="card results-card" id="network-results-card">
+            <h3>ICMP Steganalysis Findings</h3>
+            <div class="placeholder-state" id="network-placeholder">
+              <p>Upload a .pcap file to inspect ICMP packets for covert channels.</p>
+            </div>
+            <div class="results-content hidden" id="network-results-content">
+              <div class="verdict-banner" id="network-verdict-banner">
+                <div class="verdict-main">
+                  <span class="verdict-title">ICMP STATUS</span>
+                  <span class="verdict-value" id="network-prediction">NORMAL</span>
+                </div>
+                <div class="verdict-score">
+                  <span>Suspicion Score</span>
+                  <strong id="network-score">0.05</strong>
+                </div>
+              </div>
+
+              <div class="metrics-summary">
+                <div class="metric-tile">
+                  <span class="tile-val" id="net-total-pkts">0</span>
+                  <span class="tile-label">Total Packets</span>
+                </div>
+                <div class="metric-tile">
+                  <span class="tile-val" id="net-icmp-pkts">0</span>
+                  <span class="tile-label">ICMP Packets</span>
+                </div>
+                <div class="metric-tile">
+                  <span class="tile-val" id="net-flows">0</span>
+                  <span class="tile-label">Active Flows</span>
+                </div>
+                <div class="metric-tile">
+                  <span class="tile-val" id="net-entropy">0.0</span>
+                  <span class="tile-label">Avg Entropy</span>
+                </div>
+              </div>
+
+              <div class="evidence-box">
+                <h4>Statistical & Flow Evidence</h4>
+                <ul id="network-evidence-list"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Steganalysis Multi-Modal Platform &copy; 2026. Strictly defensive forensic analysis suite.</p>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

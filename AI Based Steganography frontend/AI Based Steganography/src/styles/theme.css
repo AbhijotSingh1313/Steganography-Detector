@@ -1,0 +1,138 @@
+/* ==========================================================================
+   StegoDetect AI - Design System & Variables (Dark / Light Theme Support)
+   ========================================================================== */
+
+:root {
+  /* Default Dark Forensic Cybersecurity Theme - Purple Palette */
+  --bg-primary: #0d071c;
+  --bg-secondary: #160e2e;
+  --bg-card: rgba(25, 16, 48, 0.88);
+  --bg-surface: #201344;
+  --bg-surface-light: #2c1b5c;
+  --bg-input: #120a26;
+
+  /* Accent Colors - Rich Purple */
+  --color-primary: #c084fc;       /* Purple 400 */
+  --color-primary-hover: #d8b4fe; /* Purple 300 */
+  --color-primary-dim: rgba(192, 132, 252, 0.20);
+
+  /* Status Colors */
+  --color-clean: #00ff9d;
+  --color-clean-dim: rgba(0, 255, 157, 0.14);
+
+  --color-suspicious: #ffb800;
+  --color-suspicious-dim: rgba(255, 184, 0, 0.14);
+
+  --color-stego: #ff3366;
+  --color-stego-dim: rgba(255, 51, 102, 0.18);
+
+  /* Text Colors - High Visibility & Crisp Contrast */
+  --text-primary: #ffffff;          /* Pure crisp white for primary headings, labels, and titles */
+  --text-secondary: #e2e8f0;        /* Slate 200: Clear, highly readable text for descriptions and body */
+  --text-muted: #94a3b8;            /* Slate 400: Clear secondary helper text, high contrast */
+
+  /* Borders & Shadows */
+  --border-subtle: rgba(192, 132, 252, 0.28);
+  --border-focus: rgba(192, 132, 252, 0.75);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.40);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.50);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.65);
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Navbar Variables - High Visibility */
+  --navbar-bg: linear-gradient(180deg, rgba(22, 14, 46, 0.97) 0%, rgba(13, 7, 28, 0.95) 100%);
+  --navbar-border: rgba(192, 132, 252, 0.38);
+  --navbar-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+
+  /* Typography */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+[data-theme='light'] {
+  --bg-primary: #f5ecff;          /* Richer, more visible light purple tone */
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;             /* Crisp solid white cards for optimal readability */
+  --bg-surface: #f3e8ff;          /* Soft lavender surface */
+  --bg-surface-light: #ebd5ff;
+  --bg-input: #ffffff;
+
+  --color-primary: #9333ea;       /* Purple 600 */
+  --color-primary-hover: #7e22ce; /* Purple 700 */
+  --color-primary-dim: rgba(147, 51, 234, 0.12);
+
+  --color-clean: #059669;         /* High-contrast Emerald 600 */
+  --color-clean-dim: rgba(5, 150, 105, 0.12);
+
+  --color-suspicious: #d97706;    /* High-contrast Amber 600 */
+  --color-suspicious-dim: rgba(217, 119, 6, 0.12);
+
+  --color-stego: #dc2626;         /* High-contrast Red 600 */
+  --color-stego-dim: rgba(220, 38, 38, 0.12);
+
+  /* High Visibility & Sharp Contrast Text Colors for Light Mode */
+  --text-primary: #0f172a;        /* Deep slate black - razor sharp contrast for all titles & headings */
+  --text-secondary: #334155;      /* Slate 700 - clear, comfortable readable text for body & descriptions */
+  --text-muted: #64748b;          /* Slate 500 - crisp helper & secondary metadata text */
+
+  --border-subtle: #e2d4f5;       /* Clean, visible lilac border */
+  --border-focus: #9333ea;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 14px rgba(147, 51, 234, 0.10);
+  --shadow-lg: 0 10px 28px rgba(147, 51, 234, 0.14);
+
+  /* Navbar Variables - High Visibility (Light Mode) */
+  --navbar-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 236, 255, 0.96) 100%);
+  --navbar-border: rgba(147, 51, 234, 0.35);
+  --navbar-shadow: 0 4px 20px rgba(147, 51, 234, 0.08), 0 1px 3px rgba(147, 51, 234, 0.10);
+}
+
+/* Global Reset & Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* App Container Layout */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px;
+}
