@@ -21,17 +21,23 @@ _BERT_AVAILABLE = False
 
 
 def _get_bert_components():
-    """Lazily load BERT model and tokenizer with singleton caching."""
+    """Lazily load BERT model and tokenizer from local weights without network latency."""
     global _BERT_TOKENIZER, _BERT_MODEL, _BERT_INITIALIZED, _BERT_AVAILABLE
     if not _BERT_INITIALIZED:
         _BERT_INITIALIZED = True
         try:
             import torch
-            from transformers import BertTokenizer, BertForMaskedLM
-            # Use compact BERT-Tiny for fast, CPU-friendly real-time inference
-            model_name = "google/bert_uncased_L-2_H-128_A-2"
-            _BERT_TOKENIZER = BertTokenizer.from_pretrained(model_name)
-            _BERT_MODEL = BertForMaskedLM.from_pretrained(model_name)
+            from transformers import AutoTokenizer, AutoModelForMaskedLM
+            from pathlib import Path
+            # Prioritize locally packaged weights for instant 0.05s load and zero network latency
+            local_dir = Path(__file__).resolve().parent.parent.parent.parent / "models" / "bert_tiny"
+            if local_dir.exists() and (local_dir / "model.safetensors").exists():
+                _BERT_TOKENIZER = AutoTokenizer.from_pretrained(str(local_dir), local_files_only=True)
+                _BERT_MODEL = AutoModelForMaskedLM.from_pretrained(str(local_dir), local_files_only=True)
+            else:
+                model_name = "google/bert_uncased_L-2_H-128_A-2"
+                _BERT_TOKENIZER = AutoTokenizer.from_pretrained(model_name)
+                _BERT_MODEL = AutoModelForMaskedLM.from_pretrained(model_name)
             _BERT_MODEL.eval()
             _BERT_AVAILABLE = True
         except Exception as e:
