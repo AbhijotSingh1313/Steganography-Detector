@@ -25,7 +25,10 @@ function checkBackendOnline(timeoutMs = 1500) {
 }
 
 function findPythonBackend() {
+  const home = app.getPath('home');
   const candidateDirs = [
+    path.join(home, 'Desktop', 'Steganography-Detector'),
+    path.join(home, 'Desktop', 'DF', 'Steganography-Detector'),
     path.resolve(__dirname, '../../..'),
     path.resolve(__dirname, '../..'),
     path.resolve(process.cwd(), '../..'),

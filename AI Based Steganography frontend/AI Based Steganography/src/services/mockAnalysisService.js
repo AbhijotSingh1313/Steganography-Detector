@@ -101,19 +101,63 @@ export const analysisService = {
       }
       formData.append('domain', domain);
 
-      // Determine backend API URL (supports Vite dev port 5173, Electron file://, or production same-host)
+      // Smart Multi-Target Backend Resolver:
+      // Tries local backend (localhost:8000), then automatically falls back to live cloud API
+      const CLOUD_API = 'https://stegxplore.up.railway.app';
+      const configuredApi = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
       const isDevOrElectron =
         window.location.port === '5173' ||
         window.location.protocol === 'file:' ||
         window.location.hostname === 'localhost' ||
         window.location.hostname === '127.0.0.1';
 
-      const API_BASE = isDevOrElectron ? 'http://localhost:8000' : (import.meta.env.VITE_API_URL || window.location.origin);
+      const targetBases = [];
+      if (isDevOrElectron) {
+        targetBases.push('http://127.0.0.1:8000');
+        targetBases.push('http://localhost:8000');
+      }
+      if (configuredApi && !targetBases.includes(configuredApi)) {
+        targetBases.push(configuredApi);
+      }
+      if (!targetBases.includes(CLOUD_API)) {
+        targetBases.push(CLOUD_API);
+      }
+      if (window.location.origin && window.location.origin !== 'null' && !targetBases.includes(window.location.origin)) {
+        targetBases.push(window.location.origin);
+      }
 
-      const response = await fetch(`${API_BASE}/api/analyze`, {
-        method: 'POST',
-        body: formData
-      });
+      let response = null;
+      let lastError = null;
+
+      for (const base of targetBases) {
+        try {
+          const controller = new AbortController();
+          const timeoutMs = base.includes('127.0.0.1') || base.includes('localhost') ? 2500 : 30000;
+          const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+          const res = await fetch(`${base}/api/analyze`, {
+            method: 'POST',
+            body: formData,
+            signal: controller.signal
+          });
+          clearTimeout(timer);
+
+          if (res.ok || (res.status >= 400 && res.status < 500)) {
+            response = res;
+            break;
+          }
+        } catch (err) {
+          lastError = err;
+        }
+      }
+
+      if (!response) {
+        throw new Error(
+          lastError?.message ||
+          'Could not connect to analysis service. Please check your network connection.'
+        );
+      }
+
 
       clearInterval(interval);
       onStageChange(stages[stages.length - 1]);
